@@ -1,0 +1,8 @@
+IN PLANNING
+1) "hacker" = ..... project S. ......
+2) "ship finder" = describe ship and get info
+3) "Weather app" = complete + extra features(e.g calculate mountains with snow in the next five days)
+
+IN DEVELOPMENT
+1) "music player"
+2) integrating project S.
