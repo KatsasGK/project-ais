@@ -21,3 +21,5 @@ So far i dont have a Graphical User Interface, the recommended way to use me is 
 IN V2 -> HACKING TOOLS OPTIMISATION(use custom versions instead for maximum performance and add more)
 
 IN V3 -> ADD DIFFERENT WAYS TO CONNECT(make it portable)
+
+FOR MORE INFO GO TO https://github.com/KatsasGK/project-ais/wiki
