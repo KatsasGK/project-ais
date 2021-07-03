@@ -8,11 +8,16 @@ So far i dont have a Graphical User Interface, the recommended way to use me is 
 
 
 ---TOOLS I CAN USE---
+
 "HACKING section" --> MDK3, WIRESHARK, PRISM-AP, WIFITE, NMAP, NET-DISCOVERY, WEBSITE-ANALYZE-SCRIPT.
+
 "WEATHER section" --> WEATHER-SCRIPT_V1
+
 "MUSIC section"   --> Simple-music-player
 
 
 ---FUTURE UPDATES---
+
 IN V2 -> HACKING TOOLS OPTIMISATION(use custom versions instead for maximum performance and add more)
+
 IN V3 -> ADD DIFFERENT WAYS TO CONNECT(make it portable)
