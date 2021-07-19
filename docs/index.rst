@@ -1,42 +1,46 @@
-----------INSTALL------------
+Project A.I.S.
+==============
+
+------------INSTALL-----------------
+------------------------------------
 
 1) Download everything from the github link is here -> https://github.com/KatsasGK/project-ais
-
 More info soon....
 
 
-----------CONTENTS---------
+------------FEATURES--------------
+----------------------------------
 
-CATEGORIES:
+**CATEGORIES:**
 
-SPOOFING:
+*SPOOFING:*
 
+1) MAC_ADDEESS_CHANGER_CUSTOM
 
-1 MAC_ADDEESS_CHANGER_CUSTOM
+2) WIRESHARK
 
-2 WIRESHARK
+3) MDK3
 
-3 MDK3
+4) Prism-AP
 
-4 Prism-AP
+*WIRELESS:*
 
-WIRELESS:
+1) Wifite
 
-1 Wifite
+2) Wifi_dos_own
 
-2 Wifi_dos_own
+*INFO GATHERING:*
 
-INFO GATHERING:
+1) NMAP
 
-1 NMAP
+2) Net-Discovery
 
-2 Net-Discovery
+3) WEB_ANALYZER
 
-3 WEB_ANALYZER
-
-CUSTOM COMMANDS:
+*CUSTOM COMMANDS:*
 
 --------OVERCLOCK CPU--------
+-----------------------------
 
 Cant recommend to overclock the cpu but i had stable results after installing a heatsink + fan.
 
