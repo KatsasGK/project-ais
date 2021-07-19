@@ -1,4 +1,4 @@
-# PROJECT A.I.S. V1.5
+# PROJECT A.I.S. V2
 Project-A.I.S ---> The future of A.I. and hacking combined ;)
 
 
@@ -9,7 +9,7 @@ So far i dont have a Graphical User Interface, the recommended way to use me is 
 
 ---TOOLS I CAN USE---
 
-"HACKING section" --> MDK3, WIRESHARK, PRISM-AP, WIFITE, NMAP, NET-DISCOVERY, WEBSITE-ANALYZE-SCRIPT.
+"HACKING section" --> MDK3, Custom MAC changer, WIFI_DOS_OWN ,WIRESHARK, PRISM-AP, WIFITE, NMAP, NET-DISCOVERY, WEBSITE-ANALYZE-SCRIPT, Custom commands.
 
 "WEATHER section" --> WEATHER-SCRIPT_V1
 
@@ -18,8 +18,7 @@ So far i dont have a Graphical User Interface, the recommended way to use me is 
 
 ---FUTURE UPDATES---
 
-IN V2 -> HACKING TOOLS OPTIMISATION(use custom versions instead for maximum performance and add more)
-
-IN V3 -> ADD DIFFERENT WAYS TO CONNECT(make it portable)
+IN V3 -> Custom kernel, new HOME OS ;)
 
 FOR MORE INFO GO TO https://github.com/KatsasGK/project-ais/wiki
+                 or https://readthedocs.org/projects/project-ais/
